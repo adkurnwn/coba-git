@@ -1,3 +1,6 @@
+### Docker Architecture
+![Docker Architecture](https://miro.medium.com/v2/0*kDJEckrqtk653KL_)
+
 ### Komponen Untuk Membuat Container (Docker)
 ##### 1. Docker Engine 
 Docker engine merupakan aplikasi utama yang menjalankan docker, terdapat daemon dan CLI.
@@ -85,9 +88,29 @@ docker network ls
 perintah docker network ls digunakan untuk melihat daftar network.
 
 ```sh
+docker network create <nama-network>
+```
+perintah docker network create digunakan untuk membuat network baru pada docker.
+
+```sh
+docker volume ls
+```
+perintah docker volume ls digunakan untuk menampilkan daftar volume yang ada pada docker.
+
+```sh
+docker volume create <nama-volume>
+```
+perintah docker volume create digunakan untuk membuat volume baru pada docker.
+
+```sh
 docker <image/container/volume/network> inspect <nama-object>
 ```
 perintah docker inspect tersebut digunakan untuk meng-inspect object docker berupa image, container, volume, dan network. yang dikembalikan dari perintah tersebut adalah informasi keseluruhan object dalam json.
+
+### Volume & Bind Mount pada docker
+Docker Volume adalah mekanisme bawaan docker untuk menyimpan data secara persistant di luar siklus hidup container. Dengan volume, data tidak akan hilang meskipun container dihapus, sehingga cocok digunakan untuk database, file konfigurasi, atau data aplikasi lainnya. **Volume dikelola oleh Docker sendiri** dan disimpan di lokasi khusus pada host, sehingga pengguna tidak perlu mengatur path manual. Selain itu, volume bisa dengan mudah dibagikan antar container.
+
+Bind Mount berbeda dengan volume karena langsung menghubungkan path tertentu di filesystem host ke dalam container. Artinya, file atau folder di host bisa langsung diakses dan dimodifikasi dari dalam container. Bind mount sering digunakan saat pengembangan aplikasi, karena perubahan kode di host akan langsung tercermin di container. Namun, penggunaannya perlu hati-hati karena sangat bergantung pada struktur path host, dan bisa menimbulkan masalah portabilitas jika environment host berbeda.
 
 ### Platform untuk menjalankan container (docker)
 Docker umumnya dijalankan pada os linux (platform utama & native untuk container). Docker juga dapat dijalankan pada windows dengan menggunakan wsl2.
