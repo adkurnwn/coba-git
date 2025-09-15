@@ -1,6 +1,6 @@
 ### Webserver
 Webserver adalah software (atau kadang juga hardware) yang berfungsi menerima request dari client, lalu memberikan response berupa data yang dapat berupa API, webpage, ataupun response lainnya.
-![webserver architecture](https://i.imgur.com/OikWNST_d.webp?maxwidth=1520&fidelity=grand)
+![webserver architecture](https://i.imgur.com/ry9jLBg_d.webp?maxwidth=1520&fidelity=grand)
 
 ### Jenis Webserver
 ##### 1. Apache
