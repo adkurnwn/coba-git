@@ -125,3 +125,6 @@ jobs:
         # opsional untuk deployment ke server, misal:
         # ssh user@server "docker pull ${{ env.DOCKER_HUB_USERNAME }}/${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }} && docker-compose up -d"
 ```
+
+image berhasil di push ke [docker hub registry](https://hub.docker.com/repository/docker/adkurnwn/vuejs-frontend-app/general):
+![docker hub](https://i.imgur.com/WdNn9N5_d.webp?maxwidth=1520&fidelity=grand)
