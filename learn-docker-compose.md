@@ -6,7 +6,7 @@ version: '3.8'
 services:
   #WordPress
   wordpress:
-    image: wordpress:latest
+    image: wordpress:6.8
     ports:
       - "8081:80"
     volumes:

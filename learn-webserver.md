@@ -49,25 +49,45 @@ server {
 ```
 dari konfigurasi tersebut, semua request ke `api.adekurniawan.me` akan diteruskan ke port `3000` (node js).
 ##### 3. Load balancer
-Nginx dapat membagi lalu lintas masuk ke beberapa server backend untuk mendistribusikan beban secara merata.
+Nginx dapat membagi lalu lintas request masuk ke beberapa server backend untuk mendistribusikan beban secara merata atau sesuai algoritma yang digunakan.
+![enter image description here](https://herza.id/wp-content/uploads/2022/12/load-balancing.jpg)
+
 contoh implementasi:
+terdapat 3 buah container vuejs yang dijalankan pada image yang sama dan masing-masing menggunakan port 3001, 3002, dan 3003.
+```sh
+ade@Ultron:/mnt/c/Users/adeku$ docker ps
+CONTAINER ID   IMAGE               COMMAND                  CREATED         STATUS         PORTS                  NAMES
+8481a07842aa   vue-test:serverjs   "docker-entrypoint.s…"   4 minutes ago   Up 4 minutes   0.0.0.0:3001->80/tcp   vueserverjs1
+cb61f0c8ec64   vue-test:serverjs   "docker-entrypoint.s…"   4 minutes ago   Up 4 minutes   0.0.0.0:3002->80/tcp   vueserverjs2
+e99846973efb   vue-test:serverjs   "docker-entrypoint.s…"   4 minutes ago   Up 4 minutes   0.0.0.0:3003->80/tcp   vueserverjs3
+```
+`vueserver1`
+![enter image description here](https://i.imgur.com/iRqAr8b_d.webp?maxwidth=1520&fidelity=grand)
+`vueserver2`
+![enter image description here](https://i.imgur.com/QfBwoy4_d.webp?maxwidth=1520&fidelity=grand)
+`vueserver3`
+![enter image description here](https://i.imgur.com/edO2o1e_d.webp?maxwidth=1520&fidelity=grand)
+
+dari 3 container tersebut, masing-masing dianggap sebagai entitas yang berbeda namun identik. dengan menggunakan loadbalancer dengan algoritma round-robin berikut, request akan dibagi secara bergantian.
 ```sh
 upstream backend {
-    server 127.0.0.1:3000;
     server 127.0.0.1:3001;
     server 127.0.0.1:3002;
+    server 127.0.0.1:3003;
 }
 
 server {
     listen 80;
-    server_name app.contoh.com;
 
     location / {
         proxy_pass http://backend;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
     }
 }
 ```
-dari konfigurasi tersebut, request dibagi rata ke port 3000, 3001, dan 3002.
+file konfigurasi tersebut disimpan pada `/etc/nginx/conf.d/loadbalancer.conf`. dan dilakukan restart pada service nginx. hasilnya alamat server dengan port 80 (default http) akan menampilkan 3 container sebelumnya secara bergantian berdasarkan request.
+![enter image description here](https://i.imgur.com/mRhBUzk_d.webp?maxwidth=1520&fidelity=grand)
 ##### 4. SSL/TLS termination
 Nginx dapat menangani enkripsi dan dekripsi koneksi SSL/TLS di sisi depan, sehingga server backend hanya menerima lalu lintas yang sudah didekripsi.
 
@@ -75,7 +95,72 @@ Nginx dapat menangani enkripsi dan dekripsi koneksi SSL/TLS di sisi depan, sehin
 Nginx dapat menyimpan salinan respons dari server backend dan melayani permintaan berikutnya langsung dari cache. Dengan caching, waktu respons menjadi lebih cepat dan beban pada server backend berkurang.
 
 ##### 6. Rate limiting & security
-Nginx menyediakan fitur pembatasan jumlah permintaan (rate limiting) untuk mencegah penyalahgunaan seperti serangan DDoS
+Nginx menyediakan fitur pembatasan jumlah permintaan (rate limiting) untuk mencegah penyalahgunaan seperti serangan DDoS.
+misal penerapan ratelimiting dengan nginx:
+pada file configurasi loadbalancer sebelumnya (`/etc/nginx/conf.d/loadbalancer.conf`). ditambahkan konfigurasi untuk rate limiting dengan membatasi request sebesar 5 request per detik:
+```sh
+#rate limit zone 5req/s
+limit_req_zone $binary_remote_addr zone=mylimit:10m rate=5r/s;
 
+upstream backend {
+    server 127.0.0.1:3001;
+    server 127.0.0.1:3002;
+    server 127.0.0.1:3003;
+}
+
+server {
+    listen 80;
+
+    location / {
+        #apply limit
+        limit_req zone=mylimit burst=2 nodelay;
+
+        proxy_pass http://backend;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+    }
+
+    #error response for rate limit
+    error_page 503 @limit;
+    location @limit {
+        return 429 "Too Many Requests\n";
+    }
+}
+```
+sehingga ketika melebihi batas tersebut, client tidak akan dapat menerima response dari request yang dibuat.
+```sh
+ade@Ultron:/mnt/c/Users/adeku$ for i in {1..5}; do curl -I http://localhost; done
+HTTP/1.1 200 OK
+Server: nginx/1.24.0 (Ubuntu)
+Date: Wed, 17 Sep 2025 03:16:55 GMT
+Content-Type: text/html
+Connection: keep-alive
+
+HTTP/1.1 200 OK
+Server: nginx/1.24.0 (Ubuntu)
+Date: Wed, 17 Sep 2025 03:16:55 GMT
+Content-Type: text/html
+Connection: keep-alive
+
+HTTP/1.1 200 OK
+Server: nginx/1.24.0 (Ubuntu)
+Date: Wed, 17 Sep 2025 03:16:55 GMT
+Content-Type: text/html
+Connection: keep-alive
+
+HTTP/1.1 503 Service Temporarily Unavailable
+Server: nginx/1.24.0 (Ubuntu)
+Date: Wed, 17 Sep 2025 03:16:55 GMT
+Content-Type: application/octet-stream
+Content-Length: 18
+Connection: keep-alive
+
+HTTP/1.1 503 Service Temporarily Unavailable
+Server: nginx/1.24.0 (Ubuntu)
+Date: Wed, 17 Sep 2025 03:16:55 GMT
+Content-Type: application/octet-stream
+Content-Length: 18
+Connection: keep-alive
+```
 ##### 7. Streaming server
 Nginx dapat menangani protokol streaming (misal HLS atau RTMP).
