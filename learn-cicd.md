@@ -331,3 +331,31 @@ CONTAINER ID   IMAGE                                                            
 ```
 hasil deploy dapat dilihat pada docker-frontend.adekurniawan.me:
 ![enter image description here](https://i.imgur.com/7J0vgMH_d.webp?maxwidth=1520&fidelity=grand)
+
+tambahkan ssl dengan certbot:
+```sh
+root@iZk1a1nf5wshjdz0pef7yrZ:~# sudo certbot --nginx -d frontend.adekurniawan.me
+Saving debug log to /var/log/letsencrypt/letsencrypt.log
+Certificate not yet due for renewal
+
+You have an existing certificate that has exactly the same domains or certificate name you requested and isn't close to expiry.
+(ref: /etc/letsencrypt/renewal/frontend.adekurniawan.me.conf)
+
+What would you like to do?
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+1: Attempt to reinstall this existing certificate
+2: Renew & replace the certificate (may be subject to CA rate limits)
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+Select the appropriate number [1-2] then [enter] (press 'c' to cancel): 1
+Deploying certificate
+Successfully deployed certificate for frontend.adekurniawan.me to /etc/nginx/sites-enabled/frontend.adekurniawan.me
+Congratulations! You have successfully enabled HTTPS on https://frontend.adekurniawan.me
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+If you like Certbot, please consider supporting our work by:
+ * Donating to ISRG / Let's Encrypt:   https://letsencrypt.org/donate
+ * Donating to EFF:                    https://eff.org/donate-le
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+```
+setelah menerapkan ssl, situs menjadi https dan secure:
+![enter image description here](https://i.imgur.com/ec3TflP_d.webp?maxwidth=760&fidelity=grand)![enter image description here](https://i.imgur.com/UXgKT7m_d.webp?maxwidth=760&fidelity=grand)
