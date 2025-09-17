@@ -48,7 +48,7 @@ pada dockerfile tersebut, hampir sama dengan dockerfile sebelumnya, hanya saja a
 #### 3. Multistage port 80
 ```sh
 # Stage 1: Build Vue.js
-FROM node:20-alpine as build-stage
+FROM node:20-alpine AS build-stage
 
 # Set working directory
 WORKDIR /app
