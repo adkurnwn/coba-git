@@ -83,7 +83,7 @@ env:
   DEV_DEPLOY_USER: ${{ secrets.DEV_DEPLOY_USER }}
   DEV_DEPLOY_PATH: ${{ secrets.DEV_DEPLOY_PATH }}
   DEV_SSH_PRIVATE_KEY: ${{ secrets.DEV_SSH_PRIVATE_KEY }}
-  DEV_DEPLOY_PORT: ${{ secrets.DEV_DEPLOY_PORT || '22' }}
+  DEV_DEPLOY_PORT: ${{ secrets.DEV_DEPLOY_PORT }}
 
 jobs:
   build-and-deploy:
@@ -211,7 +211,7 @@ env:
   DEV_DEPLOY_USER: ${{ secrets.DEV_DEPLOY_USER }}
   DEV_DEPLOY_PATH: ${{ secrets.DEV_DEPLOY_PATH }}
   DEV_SSH_PRIVATE_KEY: ${{ secrets.DEV_SSH_PRIVATE_KEY }}
-  DEV_DEPLOY_PORT: ${{ secrets.DEV_DEPLOY_PORT || '22' }}
+  DEV_DEPLOY_PORT: ${{ secrets.DEV_DEPLOY_PORT }}
 
 jobs:
   build-and-dockerize:
@@ -222,44 +222,15 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v4
 
-    - name: Set up Node.js
+    - name: Build Docker image
       run: |
-        echo "Versi nodejs:"
-        node -v || echo "Node.js isnt installed"
-
-        # Install NVM (buat milih versi nodejs)
-        curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
-        export NVM_DIR="$HOME/.nvm"
-        [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # Load NVM
-        
-        # Install and use Node.js 22 (sesuai versi vue sekarang)
-        nvm install 22
-        nvm use 22
-
-        # cek versi lagi
-        echo "Installed Node.js version:"
-        node --version
-        echo "Installed npm version:"
-        npm --version
-    
-        # Set up npm cache manually
-        npm config set cache ~/.npm-cache --global
-
-    - name: Install dependencies
-      run: npm ci
-
-    - name: Build
-      run: npm run build
+        # build image (dengan cache)
+        docker build -t ${{ env.DOCKER_HUB_USERNAME }}/${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }} .
 
     - name: Login to Docker Hub
       run: |
         echo "${{ env.DOCKER_HUB_ACCESS_TOKEN }}" | docker login -u ${{ env.DOCKER_HUB_USERNAME }} --password-stdin
         echo "login berhasil: ${{ env.DOCKER_HUB_USERNAME }}"
-
-    - name: Build Docker image
-      run: |
-        # build image (dengan format namauser/namarepo:branch-githubsha)
-        docker build -t ${{ env.DOCKER_HUB_USERNAME }}/${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }} .
 
     - name: Push Docker image to Docker Hub
       run: |
@@ -269,6 +240,8 @@ jobs:
     name: Deploy
     runs-on: ubuntu-22.04
     needs: build-and-dockerize
+    env:
+      CONTAINER_NAME: frontend-test-container
     
     steps:
     - name: Checkout repository
@@ -287,8 +260,6 @@ jobs:
       
     - name: Deploy to Server
       run: |
-        CONTAINER_NAME=frontend-test-container
-        
         ssh -i ~/.ssh/deploy_key -p ${{ env.DEV_DEPLOY_PORT }} ${{ env.DEV_DEPLOY_USER }}@${{ env.DEV_DEPLOY_SERVER }} << EOF
           set -e
           
@@ -317,7 +288,6 @@ jobs:
           echo "Cleaning up old images..."
           docker system prune -af --volumes
         EOF
-
 ```
 
 image berhasil di push ke [docker hub registry](https://hub.docker.com/repository/docker/adkurnwn/vuejs-frontend-app/general):
@@ -334,7 +304,7 @@ hasil deploy dapat dilihat pada docker-frontend.adekurniawan.me:
 
 tambahkan ssl dengan certbot:
 ```sh
-root@iZk1a1nf5wshjdz0pef7yrZ:~# sudo certbot --nginx -d frontend.adekurniawan.me
+root@iZk1a1nf5wshjdz0pef7yrZ:~# certbot --nginx -d frontend.adekurniawan.me
 Saving debug log to /var/log/letsencrypt/letsencrypt.log
 Certificate not yet due for renewal
 
