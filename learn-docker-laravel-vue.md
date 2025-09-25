@@ -527,3 +527,5 @@ CONTAINER ID   IMAGE                                                            
 889cdee7897e   adkurnwn/campigo:dev-actions-eafb4b5d3feebf5cf35ec72f2831ade23d287761   "/entrypoint.sh php-…"   40 minutes ago   Up 39 minutes             9000/tcp                                  campigo-app
 14b51d35a65a   mysql:8.0                                                               "docker-entrypoint.s…"   40 minutes ago   Up 40 minutes (healthy)   3306/tcp, 33060/tcp                       campigo-db
 ```
+app berjalan:
+![enter image description here](https://i.imgur.com/CR5XPw4_d.webp?maxwidth=1520&fidelity=grand)
