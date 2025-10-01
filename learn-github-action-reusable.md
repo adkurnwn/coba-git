@@ -9,62 +9,83 @@ Reusable workflows di GitHub Actions adalah fitur yang dapat membuat satu workfl
 
 ### 2. Contoh Penggunaan
 #### A. Membuat Reusable Workflow
-Repository `cicd-reusable` dibuat pada organization `solutionlabs-group`. Pada branch `dev/ade`, dibuat file workflow `.github/workflows/deployment-build.yml` dengan isi sebagai berikut:
+Repository `cicd-reusable` dibuat pada organization `solutionlabs-group`. Pada branch `dev/ade`, dibuat file workflow `.github/workflows/reusable.yml` dengan isi sebagai berikut:
 
-```yaml
-name: Build Frontend App
+   ```yaml
+    name: Reusable
 
-on:
-  workflow_call:
-    inputs:
-      node-version:
-        description: 'Node.js version to use'
-        required: false
-        default: '16.x'
-        type: string
+    on:
+    workflow_call:
+        secrets:
+        SONAR_TOKEN:
+            required: true
+        SONAR_HOST_URL:
+            required: true
 
-jobs:
-  build:
-    name: Build with NPM
-    runs-on: solutionlabs
+    jobs:
+    scan:
+        name: Code Scan
+        runs-on: solutionlabs
 
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+        steps:
+        - name: Checkout repository
+            uses: actions/checkout@v4
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: ${{ inputs.node-version }}
+        - name: Set up Node.js
+            uses: actions/setup-node@v4
+            with:
+            node-version: '22.x'
 
-      - name: Install dependencies
-        run: npm install
+        - name: Install dependencies
+            run: npm install
+        
+        #npm install terlebih dahulu agar sonarqube dapat melakukan scan pada dependencies
 
-      - name: Build application
-        run: npm run build
-```
+        - name: Run SonarQube Scan
+            uses: sonarsource/sonarqube-scan-action@v3
+            env:
+            SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+            SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+   ```
 pada workflow di atas, kita mendefinisikan reusable workflow yang bernama "Build Frontend App". workflow ini dapat dipanggil oleh workflow lain dan menerima input `node-version` untuk menentukan versi Node.js yang akan digunakan. workflow tersebut menggunakan runner `solutionlabs`.
 Pada repository reusable ini, perlu dilakukan konfigurasi pada tab `Settings > Actions > General` untuk mengizinkan workflow dari repository lain memanggil reusable workflow ini. Pilih opsi `Accessible from repositories in the 'solutionlabs-group' organization`.
 ![enter image description here](https://i.imgur.com/lnPyRQk_d.webp?maxwidth=760&fidelity=grand)
 #### B. Memanggil Reusable Workflow
 Dibuat repository bernama `magang-devops`. Pada branch `dev/ade`, dibuat file workflow `.github/workflows/deployment.yml` dengan isi sebagai berikut:
 
-```yaml
-name: CI/CD Pipeline
+   ```yaml
+    name: CI/CD Pipeline
 
-on:
-  push:
-    branches: [ dev/ade ]
+    on:
+    push:
+        branches: [ dev/ade ] 
 
-jobs:
-  call-reusable-build:
-    # call reusable workflow
-    uses: solutionlabs-group/cicd-reusable/.github/workflows/deployment-build.yml@dev/ade
-    
-    # input parameters
-    with:
-      node-version: '22.x'
-```
+    jobs:
+    call-reusable-scan:
+        name: Call SonarQube Scan
+        uses: solutionlabs-group/cicd-reusable/.github/workflows/reusable.yml@dev/ade
+        secrets: inherit
+        
+    build:
+        needs: call-reusable-scan
+        name: Build with NPM
+        runs-on: solutionlabs
+
+        steps:
+        - name: Checkout repository
+            uses: actions/checkout@v4
+
+        - name: Set up Node.js
+            uses: actions/setup-node@v4
+            with:
+            node-version: '22.x'
+
+        - name: Install dependencies
+            run: npm install
+
+        - name: Build application
+            run: npm run build
+   ```
 pada workflow di atas, kita memanggil reusable workflow dari repository `cicd-reusable` pada branch `dev/ade` dan mengirimkan input `node-version` dengan nilai `22.x`. Workflow ini akan berjalan setiap kali ada push ke branch `dev/ade` di repository `magang-devops`.
 
 **Hasil Pipeline pada Repository `magang-devops`:**
