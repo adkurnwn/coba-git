@@ -47,7 +47,7 @@ Langkah-langkah percobaan:
         - name: Install dependencies
             run: npm install
         
-        #npm install terlebih dahulu agar sonarqube dapat melakukan scan pada dependencies
+        #npm install terlebih dahulu agar sonarqube dapat menggunakan dependencies yang ada di node_modules
 
         - name: Run SonarQube Scan
             uses: sonarsource/sonarqube-scan-action@v3
@@ -109,9 +109,10 @@ Langkah-langkah percobaan:
     sonar.sources=.
     sonar.sourceEncoding=UTF-8
     sonar.javascript.file.suffixes=.js,.jsx,.mjs,.vue
+    sonar.exclusions=**/node_modules/**/*
     ```
     
-    File ini berisi konfigurasi proyek untuk SonarQube, termasuk kunci proyek, URL host, token login, sumber kode yang akan dianalisis, dan jalur laporan cakupan.
+    File ini berisi konfigurasi proyek untuk SonarQube, termasuk kunci proyek, URL host, token login, sumber kode yang akan dianalisis, dan mana yang diabaikan.
 
 5. **Hasil Codescan dengan SonarQube**
    Setelah workflow dijalankan, hasil analisis kode dapat dilihat di dashboard SonarQube. seperti gambar berikut:
