@@ -12,7 +12,6 @@ Pada workflow berikut, perlu disiapkan beberapa secret dan variable pada reposit
   - `TELEGRAM_TOPIC_ID`: ID topic pada grup Telegram
 - Variables:
   - `VULTR_REGION`: kode region Vultr, misal `sg` untuk Singapore
-  - `TELEGRAM_OK_MESSAGE`: pesan yang dikirimkan jika tidak ada alert, misal `Server Status OK`.
   - `API_URL`: URL API Vultr, sekarang digunakan: `https://status.vultr.com/status.json`
 
 Pada workflow berikut, juga terdapat workflow dispatch, sehingga dapat dijalankan secara manual jika diperlukan.
@@ -36,7 +35,6 @@ jobs:
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
           TELEGRAM_TOPIC_ID: ${{ secrets.TELEGRAM_TOPIC_ID }}
           REGION_CODE: ${{ vars.VULTR_REGION }}
-          TELEGRAM_OK_MESSAGE: ${{ vars.TELEGRAM_OK_MESSAGE }}
           API_URL: ${{ vars.API_URL }}
         run: |
           echo "Fetching Vultr status region: ${REGION_CODE}"
