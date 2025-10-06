@@ -45,13 +45,7 @@ jobs:
           # Cek apakah ada ALERT atau tidak
           if [ -z "$ALERTS" ] || [ "$(echo "$ALERTS" | jq 'length')" -eq 0 ]; then
             #Case 1: AMAN
-            echo "No alerts found. Sending OK message."
-            MESSAGE_TEXT="${TELEGRAM_OK_MESSAGE}"
-            API_RESPONSE=$(curl -s -X POST "https://api.telegram.org/bot${TELEGRAM_BOT_ID}/sendMessage" \
-              --data-urlencode "chat_id=${TELEGRAM_CHAT_ID}" \
-              --data-urlencode "message_thread_id=${TELEGRAM_TOPIC_ID}" \
-              --data-urlencode "text=${MESSAGE_TEXT}")
-            echo "Telegram API Response: $API_RESPONSE"
+            echo "No alerts found."
           else
 
             #Case 2: ADA ALERTS
@@ -76,7 +70,4 @@ jobs:
 
 Sehingga, akan mengirimkan pesan seperti berikut:
 1. Jika ada alert:
-![enter image description here](https://i.imgur.com/3VYwqCY_d.webp?maxwidth=760&fidelity=grand)
-
-2. Jika tidak ada alert:
-![enter image description here](https://i.imgur.com/sSby0fa_d.webp?maxwidth=760&fidelity=grand)
+![enter image description here](https://i.imgur.com/kOMKtAB_d.webp?maxwidth=760&fidelity=grand)
