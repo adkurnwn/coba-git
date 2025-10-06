@@ -11,7 +11,7 @@ Pada workflow berikut, perlu disiapkan beberapa secret dan variable pada reposit
   - `TELEGRAM_CHAT_ID`: ID chat grup Telegram
   - `TELEGRAM_TOPIC_ID`: ID topic pada grup Telegram
 - Variables:
-  - `VULTR_REGION`: kode region Vultr, misal `sg` untuk Singapore
+  - `VULTR_REGION`: kode region Vultr, misal `sgp` untuk Singapore
   - `TELEGRAM_OK_MESSAGE`: pesan yang dikirimkan jika tidak ada alert, misal `Server Status OK`.
   - `API_URL`: URL API Vultr, sekarang digunakan: `https://status.vultr.com/status.json`
 
