@@ -1,5 +1,5 @@
 ### Membuat Check Vultr Status dan Notifikasi ke Telegram dengan GitHub Actions
-Pada case ini, github actions akan melakukan pengecekan status Vultr pada region tertentu (singapore / dapat diubah), dan mengirimkan notifikasi ke Telegram jika ada alert. Jika tidak ada alert, maka akan mengirimkan pesan "OK" ke Telegram, dengan ketentuan:
+Pada case ini, github actions akan melakukan pengecekan status Vultr pada region tertentu (singapore / dapat diubah), dan mengirimkan notifikasi ke Telegram jika ada alert. dengan ketentuan:
 1. Menggunakan API Vultr untuk mendapatkan status: `https://status.vultr.com/status.json`
 2. Menggunakan bot Telegram untuk mengirimkan notifikasi ke grup Telegram pada topic "status"
 3. Menjalankan pengecekan setiap hari pada jam 00:00 SGT (16:00 UTC)
