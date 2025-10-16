@@ -22,7 +22,7 @@ Coba Git is a simple repository to write my learning notes about various DevOps 
 17. [Fixing Grafana Production](fixing-grafana-production.md)
 18. [Osi Layer](learn-osi-layer.md)
 19. [Vultr Notification](vultr-notification.md)
-20. [S3 Storage / Compatibility](s3-storage-compatibility.md)
+20. [S3 Storage / Compatibility](s3-minio-ceph-garage.md)
 21. [CICD SonarQube](learn-sonarqube.md)
 22. [Jenkins Notification](jenkins-sends-notification.md)
 23. [Monitoring]()
